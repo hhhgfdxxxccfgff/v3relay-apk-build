@@ -1,0 +1,156 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Electro VPN</string>
+    <string name="app_title" translatable="false">Electro VPN</string>
+    <string name="integrity_failed">این نسخه دستکاری شده و اجرا نمی‌شود.</string>
+    <string name="app_mode_vpn">حالت VPN کل گوشی (فعال)</string>
+    <string name="app_mode_proxy">حالت پروکسی اختصاصی (محلی)</string>
+    <string name="badge_armored">ضد نفوذ</string>
+    <string name="cd_connect">برقراری اتصال</string>
+    <string name="cd_disconnect">قطع اتصال</string>
+    <string name="power_connected_hint">متصل شدید • برای قطع ضربه بزنید</string>
+    <string name="power_connect_vpn">اتصال به VPN (کل گوشی)</string>
+    <string name="power_connect_proxy">شروع پروکسی محلی (SOCKS5)</string>
+
+    <string name="mode_vpn_title">VPN کل گوشی</string>
+    <string name="mode_vpn_subtitle">تونل تمام برنامه‌ها</string>
+    <string name="mode_proxy_title">پروکسی انتخابی</string>
+    <string name="mode_proxy_subtitle" translatable="false">SOCKS5 &amp; HTTP</string>
+    <string name="mode_seg_vpn" translatable="false">VPN</string>
+    <string name="mode_seg_proxy" translatable="false">Proxy</string>
+
+    <string name="status_connected">متصل و فعال</string>
+    <string name="status_offline">قطع / آفلاین</string>
+    <string name="metric_download">دانلود (DL)</string>
+    <string name="metric_upload">آپلود (UL)</string>
+    <string name="metric_active_conns">اتصالات فعال</string>
+    <string name="metric_uptime">زمان اتصال</string>
+    <string name="ping_testing">درحال پینگ...</string>
+    <string name="ping_ms">%1$d ms</string>
+    <string name="ping_quality_suffix">" (%1$s)"</string>
+    <string name="quality_excellent">عالی</string>
+    <string name="quality_good">خوب</string>
+    <string name="quality_medium">متوسط</string>
+    <string name="ping_error">خطا: %1$s</string>
+    <string name="ping_retry">تست پینگ (تپ کنید)</string>
+    <string name="ping_test">⚡ تست پینگ</string>
+    <string name="cd_ping" translatable="false">Ping</string>
+    <string name="cd_refresh" translatable="false">Refresh</string>
+    <string name="cd_retry" translatable="false">Retry</string>
+
+    <string name="quick_setup_title">اتصال سریع و تلگرام</string>
+    <string name="local_proxy_active">پروکسی محلی فعال</string>
+    <string name="local_proxy_inactive">پروکسی غیرفعال</string>
+    <string name="telegram_connect">اتصال مستقیم تلگرام با ۱ کلیک</string>
+    <string name="cd_telegram" translatable="false">Telegram</string>
+    <string name="cd_copy" translatable="false">Copy</string>
+    <string name="toast_telegram_copied">لینک پروکسی تلگرام کپی شد</string>
+    <string name="toast_socks_copied">آدرس ساکس کپی شد</string>
+    <string name="toast_http_copied">آدرس HTTP کپی شد</string>
+
+    <string name="log_title">لاگ زنده ترمینال</string>
+    <string name="log_empty">در انتظار برقراری ترافیک...</string>
+    <string name="filter_all">همه</string>
+    <string name="filter_traffic">ترافیک</string>
+    <string name="filter_success">موفق</string>
+    <string name="filter_errors">خطاها</string>
+    <string name="cd_copy_logs" translatable="false">Copy Logs</string>
+    <string name="cd_clear_logs" translatable="false">Clear Logs</string>
+    <string name="toast_logs_copied">تمام لاگ‌ها کپی شدند</string>
+    <string name="toast_logs_copy_error">خطا در کپی لاگ‌ها</string>
+
+    <string name="config_title">کانفیگ اختصاصی رمزنگاری‌شده</string>
+    <string name="config_active">کانفیگ فعال</string>
+    <string name="config_none">بدون کانفیگ</string>
+    <string name="config_profile_default">پروفایل Electro VPN فعال</string>
+    <string name="config_protected_hint">آدرس ورکر و کلیدها با استاندارد بالا محافظت شدند</string>
+    <string name="btn_replace">تغییر</string>
+    <string name="cd_clear" translatable="false">Clear</string>
+    <string name="config_import_label">ورود لینک کانفیگ (mo:// یا aria:// یا JSON)</string>
+    <string name="btn_cancel">انصراف</string>
+    <string name="config_input_hint">کد aria:// یا mo:// یا متن کانفیگ را وارد کنید</string>
+    <string name="toast_config_imported">کانفیگ با موفقیت وارد شد</string>
+    <string name="toast_config_pasted">متن در فیلد قرار گرفت، دکمه اعمال را بزنید</string>
+    <string name="toast_clipboard_empty">کلیپ‌بورد خالی است</string>
+    <string name="toast_clipboard_error">خطا در دسترسی به کلیپ‌بورد</string>
+    <string name="err_invalid_config">فرمت کانفیگ نامعتبر است</string>
+    <string name="btn_apply_config">اعمال و ذخیره کانفیگ</string>
+    <string name="btn_save">ذخیره</string>
+    <string name="btn_close">بستن</string>
+    <string name="toast_config_applied">کانفیگ با موفقیت اعمال شد</string>
+    <string name="clean_ip_label">آی‌پی تمیز کلودفلر (Clean IP / اختیاری)</string>
+    <string name="clean_ip_hint">مثال: 104.21.5.12 یا خالی برای پیش‌فرض</string>
+    <string name="advanced_ports">تنظیمات پیشرفته</string>
+    <string name="advanced_restart_hint">تغییرات روی اتصال فعال، پس از اتصال مجدد اعمال می‌شود</string>
+    <string name="port_socks">پورت SOCKS5</string>
+    <string name="port_http">پورت HTTP (۰ = خاموش)</string>
+    <string name="cd_paste" translatable="false">Paste</string>
+    <string name="http_off">خاموش</string>
+    <string name="dns_label">سرورهای DNS (حالت VPN)</string>
+    <string name="dns_hint" translatable="false">1.1.1.1, 8.8.8.8</string>
+    <string name="dns_support">چند سرور را با کاما جدا کنید (حداکثر ۴ مورد)</string>
+    <string name="auto_start_label">اتصال خودکار پس از روشن‌شدن دستگاه</string>
+    <string name="allow_lan_label">اشتراک پروکسی در شبکه محلی (LAN)</string>
+    <string name="allow_lan_warning">هشدار: هر دستگاهی در شبکه شما می‌تواند از این پروکسی استفاده کند</string>
+    <string name="split_tunnel_label">اسپلیت تانلینگ (خارج از VPN)</string>
+    <string name="split_tunnel_none">هیچ اپی</string>
+    <string name="split_tunnel_count">%1$d اپ</string>
+    <string name="split_tunnel_manage">انتخاب برنامه‌ها</string>
+    <string name="split_tunnel_title">انتخاب برنامه‌های خارج از VPN</string>
+    <string name="split_tunnel_desc">برنامه‌های انتخاب‌شده از تونل VPN عبور نمی‌کنند</string>
+    <string name="split_tunnel_search">جستجوی برنامه...</string>
+    <string name="split_tunnel_empty">برنامه‌ای یافت نشد</string>
+    <string name="theme_label">ظاهر برنامه</string>
+    <string name="theme_system">سیستم</string>
+    <string name="theme_light">روشن</string>
+    <string name="theme_dark">تیره</string>
+    <string name="language_label">زبان برنامه</string>
+    <string name="lang_system">سیستم</string>
+    <string name="lang_fa">فارسی</string>
+    <string name="lang_en" translatable="false">English</string>
+    <string name="qr_scan">اسکن QR</string>
+    <string name="qr_prompt">کد QR کانفیگ را در کادر قرار دهید</string>
+    <string name="toast_qr_perm_needed">برای اسکن QR، دسترسی دوربین لازم است</string>
+    <string name="toast_lan_copied">آدرس LAN کپی شد</string>
+    <string name="lan_address_label">آدرس شبکه محلی</string>
+
+    <string name="vm_config_imported">کانفیگ اختصاصی با موفقیت وارد شد</string>
+    <string name="vm_config_error">خطا در بازگشایی کد کانفیگ: %1$s</string>
+    <string name="vm_config_cleared">کانفیگ حذف شد.</string>
+    <string name="vm_need_config">لطفاً ابتدا کد یا لینک کانفیگ (mo:// یا aria://) را وارد کنید.</string>
+    <string name="vm_vpn_prepare_error">خطا در آماده‌سازی VPN: %1$s</string>
+    <string name="vm_vpn_start_error">خطا در اجرای سرویس VPN: %1$s</string>
+    <string name="vm_no_config">کانفیگ وارد نشده است</string>
+    <string name="vm_ping_need_config">تست پینگ: ابتدا لینک کانفیگ را وارد نمایید.</string>
+    <string name="vm_ping_success">تست پینگ موفق: %1$d میلی‌ثانیه</string>
+    <string name="vm_ping_generic_error">خطا در برقراری ارتباط</string>
+    <string name="vm_ping_failed">تست پینگ ناموفق: %1$s</string>
+
+    <string name="notif_channel_proxy" translatable="false">Electro VPN Proxy</string>
+    <string name="notif_channel_proxy_desc">نمایش وضعیت اتصال و پورت‌های پروکسی</string>
+    <string name="notif_proxy_title">سرویس رله V3 فعال است</string>
+    <string name="notif_proxy_active">سرویس پروکسی V3 فعال است ⚡</string>
+    <string name="notif_connecting">درحال برقراری ارتباط...</string>
+    <string name="notif_ports">ساکس: %1$d | اچ‌تی‌تی‌پی: %2$d</string>
+    <string name="notif_ports_socks_only">ساکس: %1$d</string>
+    <string name="notif_disconnect">قطع اتصال</string>
+    <string name="notif_channel_vpn" translatable="false">Electro VPN Service</string>
+    <string name="notif_channel_vpn_desc" translatable="false">Shows full device VPN connection status</string>
+    <string name="notif_vpn_connecting">درحال آماده‌سازی VPN...</string>
+    <string name="notif_vpn_active_title">تونل VPN کل گوشی فعال است</string>
+    <string name="notif_vpn_content">تونل کل دستگاه از طریق SOCKS5 (%1$d) و HTTP (%2$d)</string>
+    <string name="notif_vpn_content_socks_only">تونل کل دستگاه از طریق SOCKS5 (%1$d)</string>
+    <string name="notif_disconnect_vpn">قطع اتصال VPN</string>
+    <string name="tab_home">خانه</string>
+    <string name="tab_config">کانفیگ</string>
+    <string name="tab_logs">لاگ</string>
+    <string name="tab_settings">تنظیمات</string>
+    <string name="settings_title">تنظیمات</string>
+    <string name="cd_close_scanner">بستن اسکنر</string>
+    <string name="cd_torch">روشن یا خاموش کردن چراغ</string>
+    <string name="share_crash_log">ارسال گزارش خطا</string>
+    <string name="crash_log_empty">گزارش خطایی ثبت نشده است</string>
+    <string name="crash_log_subject">گزارش خطای Electro VPN</string>
+    <string name="vm_stop_error">خطا در قطع اتصال: %1$s</string>
+    <string name="crash_log_previous">گزارش خطای قبلی:</string>
+</resources>

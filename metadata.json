@@ -1,0 +1,6 @@
+{
+  "name": "V3 Relay Proxy",
+  "description": "High-performance SOCKS5 and HTTP proxy client over WebSocket with custom stream cipher and clean IP support.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

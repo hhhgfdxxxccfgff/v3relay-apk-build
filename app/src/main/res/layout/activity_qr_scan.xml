@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/qr_root"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#000000">
+
+    <com.journeyapps.barcodescanner.DecoratedBarcodeView
+        android:id="@+id/barcode_view"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
+    <com.example.qr.QrOverlayView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
+    <LinearLayout
+        android:id="@+id/qr_top_bar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="top"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:paddingStart="16dp"
+        android:paddingTop="10dp"
+        android:paddingEnd="16dp"
+        android:paddingBottom="10dp">
+
+        <ImageButton
+            android:id="@+id/qr_close"
+            android:layout_width="42dp"
+            android:layout_height="42dp"
+            android:background="@drawable/bg_qr_round"
+            android:contentDescription="@string/cd_close_scanner"
+            android:padding="11dp"
+            android:scaleType="fitCenter"
+            android:src="@drawable/ic_qr_close" />
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="12dp"
+            android:layout_weight="1"
+            android:fontFamily="sans-serif-medium"
+            android:letterSpacing="0.02"
+            android:text="@string/qr_scan"
+            android:textColor="#FFFFFF"
+            android:textSize="15sp" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/qr_bottom_bar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom"
+        android:gravity="center_horizontal"
+        android:orientation="vertical"
+        android:paddingStart="28dp"
+        android:paddingTop="16dp"
+        android:paddingEnd="28dp"
+        android:paddingBottom="28dp">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:lineSpacingExtra="4dp"
+            android:text="@string/qr_prompt"
+            android:textColor="#B8FFFFFF"
+            android:textSize="12.5sp" />
+
+        <ImageButton
+            android:id="@+id/qr_torch"
+            android:layout_width="46dp"
+            android:layout_height="46dp"
+            android:layout_marginTop="16dp"
+            android:alpha="0.6"
+            android:background="@drawable/bg_qr_round"
+            android:contentDescription="@string/cd_torch"
+            android:padding="12dp"
+            android:scaleType="fitCenter"
+            android:src="@drawable/ic_qr_flash" />
+    </LinearLayout>
+</FrameLayout>
