@@ -23,6 +23,9 @@ jobs:
           "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" --install "platforms;android-36.1" > /dev/null 2>&1 || true
           ls "$ANDROID_HOME/platforms" || true
 
+      - name: Tune Gradle memory (CI has more RAM)
+        run: sed -i 's/^org.gradle.jvmargs=.*/org.gradle.jvmargs=-Xmx4096m -XX:MaxMetaspaceSize=1024m -XX:ReservedCodeCacheSize=256m -Dfile.encoding=UTF-8/' gradle.properties && grep ^org.gradle.jvmargs gradle.properties
+
       - name: Build release + debug APK
         env:
           KEYSTORE_PATH: ${{ github.workspace }}/my-upload-key.p12
