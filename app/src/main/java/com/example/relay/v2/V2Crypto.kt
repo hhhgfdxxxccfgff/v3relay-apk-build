@@ -228,20 +228,17 @@ object V2Crypto {
     private val POLY_RMASK = BigInteger("0ffffffc0ffffffc0ffffffc0fffffff", 16)
 
     fun poly1305(key: ByteArray, data: ByteArray): ByteArray {
-        val r = BigInteger(1, key.copyOfRange(0, 16)).and(POLY_RMASK)
-        val s = BigInteger(1, key.copyOfRange(16, 32))
+        // Poly1305 is little-endian: reverse bytes before BigInteger (big-endian)
+        val r = BigInteger(1, key.copyOfRange(0, 16).reversedArray()).and(POLY_RMASK)
+        val s = BigInteger(1, key.copyOfRange(16, 32).reversedArray())
         var acc = BigInteger.ZERO
         var i = 0
         while (i < data.size) {
             val blk = data.copyOfRange(i, minOf(i + 16, data.size))
             val padded = ByteArray(17)
             System.arraycopy(blk, 0, padded, 0, blk.size)
-            val pad = 16 - blk.size - 1
-            if (pad > 0) {
-                // zeros already zero-initialized in ByteArray
-            }
-            padded[16] = 1  // marker at final byte (LE)
-            val num = BigInteger(1, padded)
+            padded[16] = 1
+            val num = BigInteger(1, padded.reversedArray())
             acc = acc.add(num).multiply(r).mod(POLY_P)
             i += 16
         }
@@ -358,13 +355,14 @@ object V2Crypto {
     private val XP = BigInteger.ONE.shiftLeft(255).subtract(BigInteger.valueOf(19))
 
     fun x25519(kBytes: ByteArray, uBytes: ByteArray): ByteArray {
+        // x25519 is little-endian: reverse bytes before BigInteger (big-endian)
         val k = kBytes.copyOf()
         k[0] = (k[0].toInt() and 248).toByte()
         k[31] = ((k[31].toInt() and 127) or 64).toByte()
-        val kk = BigInteger(1, k)
+        val kk = BigInteger(1, k.reversedArray())
         val u = uBytes.copyOf()
         u[31] = (u[31].toInt() and 127).toByte()
-        val x1 = BigInteger(1, u)
+        val x1 = BigInteger(1, u.reversedArray())
         var x2 = BigInteger.ONE; var z2 = BigInteger.ZERO
         var x3 = x1; var z3 = BigInteger.ONE
         var swap = 0
