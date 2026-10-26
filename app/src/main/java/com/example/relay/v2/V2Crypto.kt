@@ -298,7 +298,7 @@ object V2Crypto {
         if (!constEq(poly1305(pol, macData), tag)) return null
         if (ct.isEmpty()) return ByteArray(0)
         val ks = chachaKs(key, nonce, 64, ct.size)
-        return ByteArray(ct.size) { j -> (ct[j].toInt() xor ks[j]).toByte() }
+        return ByteArray(ct.size) { j -> (ct[j].toInt() xor ks[j].toInt()).toByte() }
     }
 
     private fun constEq(a: ByteArray, b: ByteArray): Boolean {
