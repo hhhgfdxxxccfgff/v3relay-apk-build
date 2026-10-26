@@ -12,7 +12,9 @@ data class DecodedConfig(
     val workerUrl: String,
     val secret: String,
     val name: String = "",
-    val cleanIp: String = ""
+    val cleanIp: String = "",
+    val kpub: String = "",     // devsync v2 server X25519 pub (64 hex) - from "k"
+    val protoP: Int = 0        // protocol mode from "p" (0 = unspecified => auto)
 )
 
 object ConfigDecoder {
@@ -54,7 +56,7 @@ object ConfigDecoder {
 
         // 2. Check if raw JSON directly
         if (raw.startsWith("{") && raw.endsWith("}")) {
-            val jsonCfg = parseJsonConfig(raw)
+            val jsonCfg = parseJsonConfig(raw, "", "", kpubFromQuery, pmodeFromQuery)
             if (jsonCfg != null) return@runCatching jsonCfg
         }
 
@@ -68,6 +70,8 @@ object ConfigDecoder {
 
         var secretFromQuery = ""
         var cleanIpFromQuery = ""
+        var kpubFromQuery = ""
+        var pmodeFromQuery = 0
         if (raw.contains("?")) {
             val query = raw.substringAfter("?")
             raw = raw.substringBefore("?")
@@ -79,6 +83,8 @@ object ConfigDecoder {
                     "clean", "clean_ip", "cleanip", "ip" -> cleanIpFromQuery = value
                     "s", "secret", "key", "password", "token" -> secretFromQuery = value
                     "name", "remark", "tag" -> if (customName.isBlank()) customName = value
+                    "k", "kpub", "pub", "public" -> if (kpubFromQuery.isBlank()) kpubFromQuery = value
+                    "p", "pmode", "proto" -> if (pmodeFromQuery == 0) pmodeFromQuery = value.toIntOrNull() ?: 0
                 }
             }
         }
@@ -100,7 +106,9 @@ object ConfigDecoder {
                 workerUrl = workerUrl,
                 secret = secret,
                 name = if (customName.isNotBlank() && customName != secret) customName else "ورکر ابری",
-                cleanIp = cleanIpFromQuery
+                cleanIp = cleanIpFromQuery,
+                kpub = kpubFromQuery,
+                protoP = pmodeFromQuery
             )
         }
 
@@ -144,7 +152,7 @@ object ConfigDecoder {
         try {
             val possibleJsonStr = String(wire, Charsets.UTF_8).trim()
             if (possibleJsonStr.startsWith("{") && possibleJsonStr.endsWith("}")) {
-                val jsonCfg = parseJsonConfig(possibleJsonStr, customName, cleanIpFromQuery)
+                val jsonCfg = parseJsonConfig(possibleJsonStr, customName, cleanIpFromQuery, kpubFromQuery, pmodeFromQuery)
                 if (jsonCfg != null) return@runCatching jsonCfg
             }
         } catch (_: Exception) {}
@@ -174,7 +182,7 @@ object ConfigDecoder {
                     val sc = StreamCrypt(base, nonce, "cfg")
                     val plainBytes = sc.crypt(ct)
                     val plainJson = String(plainBytes, Charsets.UTF_8)
-                    val jsonCfg = parseJsonConfig(plainJson, customName, cleanIpFromQuery)
+                    val jsonCfg = parseJsonConfig(plainJson, customName, cleanIpFromQuery, kpubFromQuery, pmodeFromQuery)
                     if (jsonCfg != null) return@runCatching jsonCfg
                 }
             }
@@ -207,13 +215,17 @@ object ConfigDecoder {
     private fun parseJsonConfig(
         jsonStr: String,
         customName: String = "",
-        cleanIpFallback: String = ""
+        cleanIpFallback: String = "",
+        qKpub: String = "",
+        qPmode: Int = 0
     ): DecodedConfig? {
         return try {
             var w = ""
             var s = ""
             var n = ""
             var clean = ""
+            var kpub = ""
+            var pmode = 0
 
             try {
                 val json = JSONObject(jsonStr)
@@ -253,6 +265,16 @@ object ConfigDecoder {
                             json.optString("ip", cleanIpFallback)
                         }
                     }
+                }
+
+                kpub = json.optString("k", "").ifBlank {
+                    json.optString("kpub", "").ifBlank {
+                        json.optString("pub", "")
+                    }
+                }
+
+                pmode = try { json.getInt("p") } catch (_: Throwable) {
+                    try { json.getInt("pmode") } catch (_: Throwable) { 0 }
                 }
 
                 // mirror the reference decoder: only version 1 configs are accepted
@@ -308,6 +330,20 @@ object ConfigDecoder {
                 }
             }
 
+            if (kpub.isBlank()) {
+                kpub = extractJsonField(jsonStr, "k").ifBlank {
+                    extractJsonField(jsonStr, "kpub").ifBlank {
+                        extractJsonField(jsonStr, "pub")
+                    }
+                }
+            }
+            if (pmode == 0) {
+                pmode = extractJsonField(jsonStr, "p").toIntOrNull()
+                    ?: extractJsonField(jsonStr, "pmode").toIntOrNull() ?: 0
+            }
+            if (kpub.isBlank()) kpub = qKpub
+            if (pmode == 0) pmode = qPmode
+
             if (w.isNotBlank() && s.isNotBlank()) {
                 val formattedUrl = if (!w.contains("://")) "https://$w" else w
                 val finalName = when {
@@ -320,7 +356,9 @@ object ConfigDecoder {
                     workerUrl = formattedUrl,
                     secret = s,
                     name = finalName,
-                    cleanIp = clean
+                    cleanIp = clean,
+                    kpub = kpub,
+                    protoP = pmode
                 )
             } else {
                 null

@@ -2,6 +2,7 @@ package com.example.relay.proxy
 
 import android.net.Uri
 import com.example.relay.tunnel.WSTunnel
+import com.example.relay.v2.V2Tunnel
 import java.io.ByteArrayOutputStream
 import java.io.InputStream
 import java.io.OutputStream
@@ -78,6 +79,19 @@ object HttpProxyHandler {
                 outStream.write("HTTP/1.1 200 Connection Established\r\n\r\n".toByteArray(Charsets.UTF_8))
                 outStream.flush()
 
+                if (V2Tunnel.dispatch(
+                        cli = clientSocket,
+                        host = host,
+                        port = port,
+                        workerParam = workerUrl,
+                        secretParam = secret,
+                        cleanIpParam = cleanIp,
+                        first = null
+                    )
+                ) {
+                    return
+                }
+
                 WSTunnel.tunnel(
                     clientSocket = clientSocket,
                     targetHost = host,
@@ -141,6 +155,19 @@ object HttpProxyHandler {
 
             if (host.isNullOrBlank()) {
                 clientSocket.close()
+                return
+            }
+
+            if (V2Tunnel.dispatch(
+                    cli = clientSocket,
+                    host = host,
+                    port = port,
+                    workerParam = workerUrl,
+                    secretParam = secret,
+                    cleanIpParam = cleanIp,
+                    first = fwdBytes
+                )
+            ) {
                 return
             }
 

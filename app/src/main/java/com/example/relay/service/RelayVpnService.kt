@@ -58,6 +58,8 @@ class RelayVpnService : VpnService() {
         const val EXTRA_DNS = "extra_dns"
         const val EXTRA_EXCLUDED_APPS = "extra_excluded_apps"
         const val EXTRA_ALLOW_LAN = "extra_allow_lan"
+        const val EXTRA_KPUB = "extra_kpub"
+        const val EXTRA_PMODE = "extra_pmode"
 
         private const val NOTIFICATION_ID = 2002
         private const val CHANNEL_ID = "v3_relay_vpn_channel"
@@ -73,7 +75,9 @@ class RelayVpnService : VpnService() {
             httpPort: Int,
             dnsServers: String = DEFAULT_DNS,
             excludedApps: ArrayList<String> = ArrayList(),
-            allowLan: Boolean = false
+            allowLan: Boolean = false,
+            kpub: String = "",
+            pMode: Int = 0
         ) {
             val intent = Intent(context, RelayVpnService::class.java).apply {
                 action = ACTION_START
@@ -85,6 +89,8 @@ class RelayVpnService : VpnService() {
                 putExtra(EXTRA_DNS, dnsServers)
                 putStringArrayListExtra(EXTRA_EXCLUDED_APPS, excludedApps)
                 putExtra(EXTRA_ALLOW_LAN, allowLan)
+                putExtra(EXTRA_KPUB, kpub)
+                putExtra(EXTRA_PMODE, pMode)
             }
             try {
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
@@ -130,6 +136,8 @@ class RelayVpnService : VpnService() {
                 val dnsServers = intent.getStringExtra(EXTRA_DNS) ?: DEFAULT_DNS
                 val excludedApps = intent.getStringArrayListExtra(EXTRA_EXCLUDED_APPS) ?: ArrayList()
                 val allowLan = intent.getBooleanExtra(EXTRA_ALLOW_LAN, false)
+                val kpub = intent.getStringExtra(EXTRA_KPUB) ?: ""
+                val pMode = intent.getIntExtra(EXTRA_PMODE, 0)
 
                 safeStartForeground(buildNotification(getString(R.string.notif_vpn_connecting), socksPort, httpPort))
 
@@ -142,7 +150,9 @@ class RelayVpnService : VpnService() {
                     mode = ProxyMode.VPN_MODE,
                     dnsServers = dnsServers,
                     excludedApps = excludedApps.toSet(),
-                    allowLan = allowLan
+                    allowLan = allowLan,
+                    kpubPublic = kpub,
+                    pMode = pMode
                 )
 
                 // 1. Start local proxy servers

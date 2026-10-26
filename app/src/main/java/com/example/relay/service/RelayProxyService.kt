@@ -42,6 +42,8 @@ class RelayProxyService : Service() {
         const val EXTRA_SOCKS_PORT = "extra_socks_port"
         const val EXTRA_HTTP_PORT = "extra_http_port"
         const val EXTRA_ALLOW_LAN = "extra_allow_lan"
+        const val EXTRA_KPUB = "extra_kpub"
+        const val EXTRA_PMODE = "extra_pmode"
 
         private const val NOTIFICATION_ID = 1001
         private const val CHANNEL_ID = "v3_relay_proxy_channel"
@@ -54,7 +56,9 @@ class RelayProxyService : Service() {
             cleanIp: String,
             socksPort: Int,
             httpPort: Int,
-            allowLan: Boolean = false
+            allowLan: Boolean = false,
+            kpub: String = "",
+            pMode: Int = 0
         ) {
             val intent = Intent(context, RelayProxyService::class.java).apply {
                 action = ACTION_START
@@ -64,6 +68,8 @@ class RelayProxyService : Service() {
                 putExtra(EXTRA_SOCKS_PORT, socksPort)
                 putExtra(EXTRA_HTTP_PORT, httpPort)
                 putExtra(EXTRA_ALLOW_LAN, allowLan)
+                putExtra(EXTRA_KPUB, kpub)
+                putExtra(EXTRA_PMODE, pMode)
             }
             try {
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
@@ -106,6 +112,8 @@ class RelayProxyService : Service() {
                 val socksPort = intent.getIntExtra(EXTRA_SOCKS_PORT, 1080)
                 val httpPort = intent.getIntExtra(EXTRA_HTTP_PORT, 8080)
                 val allowLan = intent.getBooleanExtra(EXTRA_ALLOW_LAN, false)
+                val kpub = intent.getStringExtra(EXTRA_KPUB) ?: ""
+                val pMode = intent.getIntExtra(EXTRA_PMODE, 0)
 
                 safeStartForeground(buildNotification(getString(R.string.notif_proxy_title), getString(R.string.notif_connecting)))
 
@@ -115,7 +123,9 @@ class RelayProxyService : Service() {
                     cleanIp = cleanIp,
                     socksPort = socksPort,
                     httpPort = httpPort,
-                    allowLan = allowLan
+                    allowLan = allowLan,
+                    kpubPublic = kpub,
+                    pMode = pMode
                 )
 
                 ProxyServerManager.start(config)

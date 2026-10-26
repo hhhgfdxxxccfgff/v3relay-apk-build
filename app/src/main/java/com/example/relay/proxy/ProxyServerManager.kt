@@ -9,6 +9,7 @@ import com.example.relay.data.ProxyStats
 import com.example.relay.service.CoverTrafficManager
 import com.example.relay.service.VpnProtector
 import com.example.relay.tunnel.WSTunnel
+import com.example.relay.v2.V2Tunnel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -69,12 +70,43 @@ object ProxyServerManager {
         lastStatsEmitTime.set(0L)
         updateStats()
 
+        // python main(): انتخاب پروتکل دقیقا مثل مرجع
+        var kpub = config.kpubPublic.trim()
+        var pmode = if (config.pMode == 0) {
+            if (kpub.isNotEmpty()) 2 else 1
+        } else {
+            config.pMode
+        }
+        if (kpub.isNotEmpty() && !(kpub.length == 64 && kpub.all { it in "0123456789abcdefABCDEF" })) {
+            addLog("kpub invalid — v2 off", LogType.ERROR)
+            kpub = ""
+            pmode = 1
+        }
+        var proto = if (kpub.isNotEmpty() && pmode == 2) "v2" else "v1"
+        // python `_V2["init"] = info` + eager build_v2_manager()
+        try {
+            V2Tunnel.resetStartup()
+            if (proto == "v2") {
+                V2Tunnel.initStartup(config.workerUrl, config.secret, kpub.lowercase(), config.cleanIp.ifBlank { null })
+                val built = try {
+                    V2Tunnel.buildNow() != null
+                } catch (e: Throwable) {
+                    null
+                }
+                if (built != true) {
+                    proto = "v1"
+                    addLog("v2 init failed → v1", LogType.ERROR)
+                }
+            }
+        } catch (_: Throwable) {}
+
         addLog("شروع سرویس رله اختصاصی...", LogType.INFO)
         val targetLabel = if (config.configName.isNotBlank()) "پروفایل: ${config.configName}" else "پروفایل رمزنگاری‌شده"
         addLog("$targetLabel (محافظت‌شده و امن)", LogType.INFO)
         if (config.cleanIp.isNotBlank()) {
             addLog("آی‌پی تمیز فعال: ${config.cleanIp}", LogType.INFO)
         }
+        addLog("protocol: $proto", LogType.INFO)
 
         val bindHost = if (config.allowLan) "0.0.0.0" else "127.0.0.1"
 
@@ -199,6 +231,9 @@ object ProxyServerManager {
         }
         activeClients.clear()
         activeConns.set(0)
+
+        // توقف v2 (python: عدم مکث طولانی؛ سشن‌ها بسته و manager ریست می‌شود)
+        try { V2Tunnel.resetStartup() } catch (_: Throwable) {}
 
         _isRunning.value = false
         try {

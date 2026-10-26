@@ -1,6 +1,7 @@
 package com.example.relay.proxy
 
 import com.example.relay.tunnel.WSTunnel
+import com.example.relay.v2.V2Tunnel
 import java.io.InputStream
 import java.io.OutputStream
 import java.net.InetAddress
@@ -88,6 +89,20 @@ object Socks5Handler {
             // Reply Success: VER=5, REP=0, RSV=0, ATYP=1, BND.ADDR=0.0.0.0, BND.PORT=0
             outStream.write(byteArrayOf(0x05, 0x00, 0x00, 0x01, 0, 0, 0, 0, 0, 0))
             outStream.flush()
+
+            // python tunnel_dispatch: v2 path first; v1 (WS) as fallback
+            if (V2Tunnel.dispatch(
+                    cli = clientSocket,
+                    host = host,
+                    port = port,
+                    workerParam = workerUrl,
+                    secretParam = secret,
+                    cleanIpParam = cleanIp,
+                    first = null
+                )
+            ) {
+                return
+            }
 
             WSTunnel.tunnel(
                 clientSocket = clientSocket,

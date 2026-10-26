@@ -132,7 +132,9 @@ class ProxyViewModel(application: Application) : AndroidViewModel(application) {
                 secret = decoded.secret,
                 configCode = code.trim(),
                 configName = decoded.name,
-                cleanIp = if (decoded.cleanIp.isNotBlank()) decoded.cleanIp else _config.value.cleanIp
+                cleanIp = if (decoded.cleanIp.isNotBlank()) decoded.cleanIp else _config.value.cleanIp,
+                kpubPublic = decoded.kpub.trim(),
+                pMode = decoded.protoP
             )
             _config.value = updated
             repository.saveConfig(updated)
@@ -150,7 +152,9 @@ class ProxyViewModel(application: Application) : AndroidViewModel(application) {
             workerUrl = "",
             secret = "",
             configCode = "",
-            configName = ""
+            configName = "",
+            kpubPublic = "",
+            pMode = 0
         )
         _config.value = updated
         repository.saveConfig(updated)

@@ -3,6 +3,9 @@ package com.example.relay.tunnel
 import com.example.relay.crypto.StreamCrypt
 import com.example.relay.data.LogType
 import com.example.relay.proxy.ProxyServerManager
+import com.example.relay.v2.V2AppIo
+import com.example.relay.v2.V2Stream
+import com.example.relay.v2.V2Tunnel
 import com.example.relay.ws.WSConn
 import org.json.JSONObject
 import java.io.FileOutputStream
@@ -37,6 +40,83 @@ class TunTcpHandler(
         val outgoingQueue = LinkedBlockingQueue<ByteArray>(64)
         var wsConn: WSConn? = null
         var lastActivityTime = System.currentTimeMillis()
+    }
+
+    /** python `_v2_app_pump` + app_sock semantics mapped onto a TUN session */
+    private class V2TunIo(
+        private val session: TunTcpSession,
+        private val writer: FileOutputStream,
+        private val handlerClosed: AtomicBoolean
+    ) : V2AppIo {
+        var st: V2Stream? = null
+
+        private fun writePacket(payload: ByteArray, flags: Int) {
+            val s = st ?: return
+            try {
+                val pkt = TunPacketUtils.createTcpPacket(
+                    srcIp = session.dstIp,
+                    dstIp = session.clientIp,
+                    srcPort = session.dstPort,
+                    dstPort = session.clientPort,
+                    seq = session.mySeq,
+                    ack = session.expectedClientSeq,
+                    flags = flags,
+                    payload = payload
+                )
+                if (payload.isNotEmpty()) {
+                    session.mySeq = (session.mySeq + payload.size) and 0xFFFFFFFFL
+                } else if ((flags and 0x01) != 0) {
+                    // FIN consumes one seq number
+                    session.mySeq = (session.mySeq + 1) and 0xFFFFFFFFL
+                }
+                synchronized(writer) {
+                    try {
+                        writer.write(pkt)
+                        writer.flush()
+                    } catch (_: Throwable) {}
+                }
+            } catch (_: Throwable) {}
+        }
+
+        override fun sendAll(data: ByteArray) {
+            var offset = 0
+            while (offset < data.size && !session.isClosed.get()) {
+                val end = offset + minOf(1360, data.size - offset)
+                val chunk = data.copyOfRange(offset, end)
+                writePacket(chunk, 0x18) // PSH | ACK
+                offset = end
+            }
+            session.lastActivityTime = System.currentTimeMillis()
+        }
+
+        /** python app_fin(): server half-closed - EOF toward the app, upstream free */
+        override fun finOut() {
+            writePacket(ByteArray(0), 0x11) // FIN | ACK
+        }
+
+        override fun close() {
+            try {
+                writePacket(ByteArray(0), 0x14) // RST | ACK
+            } catch (_: Throwable) {}
+        }
+
+        /** python `_v2_app_pump`: app -> server */
+        override fun pumpRun() {
+            val s = st ?: return
+            try {
+                while (!session.isClosed.get() && !handlerClosed.get()) {
+                    val data = session.outgoingQueue.poll(400, TimeUnit.MILLISECONDS) ?: continue
+                    if (data.isEmpty()) continue
+                    val cur = s.upows
+                    s.upows = cur + data.size
+                    s.sendUp(cur, data)
+                    session.lastActivityTime = System.currentTimeMillis()
+                }
+            } catch (_: Throwable) {}
+            try {
+                s.mgr.upQueue(0x04, s.stid, 0, byteArrayOf(2))
+            } catch (_: Throwable) {}
+        }
     }
 
     private val sessions = ConcurrentHashMap<String, TunTcpSession>()
@@ -220,6 +300,29 @@ class TunTcpHandler(
         }
     }
 
+    /** python tunnel_v2 for a TUN session */
+    private fun runV2TunSession(
+        sessionKey: String,
+        session: TunTcpSession,
+        dstHost: String,
+        dstPort: Int,
+        mgr: com.example.relay.v2.V2Manager
+    ) {
+        val io = V2TunIo(session, outStream, isHandlerClosed)
+        val st = mgr.openStream(io, dstHost, dstPort, ByteArray(0))
+        io.st = st
+        thread(name = "V2TunPump-$sessionKey", isDaemon = true) { io.pumpRun() }
+        try {
+            while (!st.done.await(250, TimeUnit.MILLISECONDS)) {
+                if (session.isClosed.get() || isHandlerClosed.get()) break
+            }
+        } catch (_: InterruptedException) {}
+        try { mgr.dropStream(st) } catch (_: Throwable) {}
+        session.isClosed.set(true)
+        sessions.remove(sessionKey)
+        try { io.close() } catch (_: Throwable) {}
+    }
+
     private fun startSessionWorker(
         sessionKey: String,
         session: TunTcpSession,
@@ -234,6 +337,15 @@ class TunTcpHandler(
                 var senderThread: Thread? = null
 
                 try {
+                    // python tunnel_dispatch: v2 path first (TUN equivalent)
+                    if (V2Tunnel.v2Active()) {
+                        val mgr = V2Tunnel.managerOrNull()
+                        if (mgr != null) {
+                            runV2TunSession(sessionKey, session, dstHost, dstPort, mgr)
+                            return@submit
+                        }
+                    }
+
                     ProxyServerManager.addLog("تونل TCP مستقیم: $dstHost:$dstPort", LogType.TRAFFIC)
 
                     ws = WSConn(

@@ -24,7 +24,9 @@ object ServiceStarter {
             httpPort = config.httpPort,
             dnsServers = config.dnsServers,
             excludedApps = ArrayList(config.excludedApps),
-            allowLan = config.allowLan
+            allowLan = config.allowLan,
+            kpub = config.kpubPublic,
+            pMode = config.pMode
         )
     }
 
@@ -36,7 +38,9 @@ object ServiceStarter {
             cleanIp = config.cleanIp,
             socksPort = config.socksPort,
             httpPort = config.httpPort,
-            allowLan = config.allowLan
+            allowLan = config.allowLan,
+            kpub = config.kpubPublic,
+            pMode = config.pMode
         )
     }
 }

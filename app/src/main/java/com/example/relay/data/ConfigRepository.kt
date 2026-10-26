@@ -22,6 +22,8 @@ class ConfigRepository(context: Context) {
         private const val KEY_ALLOW_LAN = "allow_lan"
         private const val KEY_THEME = "theme_mode"
         private const val KEY_LANGUAGE = "language"
+        private const val KEY_KPUB = "kpub_public"
+        private const val KEY_PMODE = "p_mode"
 
         private const val DEFAULT_DNS = "1.1.1.1, 8.8.8.8"
 
@@ -57,7 +59,9 @@ class ConfigRepository(context: Context) {
             autoStartOnBoot = prefs.getBoolean(KEY_AUTO_START, false),
             allowLan = prefs.getBoolean(KEY_ALLOW_LAN, false),
             themeMode = themeMode,
-            language = prefs.getString(KEY_LANGUAGE, "") ?: ""
+            language = prefs.getString(KEY_LANGUAGE, "") ?: "",
+            kpubPublic = readSecret(KEY_KPUB),
+            pMode = if (prefs.contains(KEY_PMODE)) prefs.getInt(KEY_PMODE, 0) else 0
         )
         val needsMigration = isLegacySecret(KEY_WORKER_URL) || isLegacySecret(KEY_SECRET) ||
             isLegacySecret(KEY_CLEAN_IP) || isLegacySecret(KEY_CONFIG_CODE) ||
@@ -82,6 +86,8 @@ class ConfigRepository(context: Context) {
             .putBoolean(KEY_ALLOW_LAN, config.allowLan)
             .putString(KEY_THEME, config.themeMode.name)
             .putString(KEY_LANGUAGE, config.language)
+            .putString(KEY_KPUB, SecretBox.encrypt(config.kpubPublic.trim()))
+            .putInt(KEY_PMODE, config.pMode)
             .apply()
     }
 }

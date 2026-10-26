@@ -43,7 +43,9 @@ data class ProxyConfig(
     val autoStartOnBoot: Boolean = false,
     val allowLan: Boolean = false,
     val themeMode: ThemeMode = ThemeMode.DARK,
-    val language: String = ""              // "" = system, "fa", "en"
+    val language: String = "",             // "" = system, "fa", "en"
+    val kpubPublic: String = "",            // devsync v2 server X25519 pub (hex) - empty = v1 WS
+    val pMode: Int = 0                      // 0=auto (2 if kpub else 1), 1=WS only, 2=v2 only
 )
 
 data class ProxyStats(

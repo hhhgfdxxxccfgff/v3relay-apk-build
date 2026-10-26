@@ -26,6 +26,9 @@ jobs:
       - name: Tune Gradle memory (CI has more RAM)
         run: sed -i 's/^org.gradle.jvmargs=.*/org.gradle.jvmargs=-Xmx4096m -XX:MaxMetaspaceSize=1024m -XX:ReservedCodeCacheSize=256m -Dfile.encoding=UTF-8/' gradle.properties && grep ^org.gradle.jvmargs gradle.properties
 
+      - name: Run V2 crypto self test
+        run: ./gradlew :app:testDebugUnitTest --tests "com.example.relay.v2.V2CryptoSelfTest" --no-daemon --console=plain
+
       - name: Build release + debug APK
         env:
           KEYSTORE_PATH: ${{ github.workspace }}/my-upload-key.p12
