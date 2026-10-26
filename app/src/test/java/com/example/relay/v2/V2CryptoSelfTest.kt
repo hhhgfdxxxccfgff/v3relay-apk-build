@@ -188,7 +188,7 @@ class V2CryptoSelfTest {
 
     @Test
     fun v2UidMac() {
-        val secret = "ssecret".toByteArray(Charsets.US_ASCII)
+        val secret = "secret".toByteArray(Charsets.US_ASCII)
         val uid = V2Crypto.v2uid(secret)
         assertArrayEquals(
             V2Crypto.unhex("6f5230739913f9336fde5a02"),
