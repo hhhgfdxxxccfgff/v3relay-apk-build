@@ -54,13 +54,7 @@ object ConfigDecoder {
         // 1. Extract link if surrounded by multi-line Telegram text
         raw = extractConfigToken(raw)
 
-        // 2. Check if raw JSON directly
-        if (raw.startsWith("{") && raw.endsWith("}")) {
-            val jsonCfg = parseJsonConfig(raw, "", "", kpubFromQuery, pmodeFromQuery)
-            if (jsonCfg != null) return@runCatching jsonCfg
-        }
-
-        // 3. Extract fragment (e.g. #ServerName) and query parameters (e.g. ?clean=1.2.3.4&s=...)
+        // 2. Extract fragment (e.g. #ServerName) and query parameters (e.g. ?clean=1.2.3.4&s=...)
         var customName = ""
         if (raw.contains("#")) {
             val frag = raw.substringAfter("#").trim()
@@ -87,6 +81,12 @@ object ConfigDecoder {
                     "p", "pmode", "proto" -> if (pmodeFromQuery == 0) pmodeFromQuery = value.toIntOrNull() ?: 0
                 }
             }
+        }
+
+        // 3. Check if raw JSON directly
+        if (raw.startsWith("{") && raw.endsWith("}")) {
+            val jsonCfg = parseJsonConfig(raw, "", "", kpubFromQuery, pmodeFromQuery)
+            if (jsonCfg != null) return@runCatching jsonCfg
         }
 
         // 4. Check if it's a direct Worker / HTTP(S) URL (and not raw JSON)

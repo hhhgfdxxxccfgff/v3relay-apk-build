@@ -44,7 +44,7 @@ class V2Stream internal constructor(
     internal val mgr = mgr0
     @Volatile
     var f = 0L                       // frontier delivered to app (down)
-    private val pc = HashMap<Long, ByteArray>()   // pending pieces (pos -> data)
+    internal val pc = HashMap<Long, ByteArray>()   // pending pieces (pos -> data)
     @Volatile
     var acked = 0L
     @Volatile
@@ -237,7 +237,7 @@ class V2Manager(
             Log.d(TAG, "hs-err ${e.javaClass.simpleName}")
             null
         }
-        when (res) {
+        return when (res) {
             is V2Ses -> {
                 plock.lock()
                 try {
@@ -306,7 +306,7 @@ class V2Manager(
             )
         } catch (_: Throwable) {
             return "fail"
-        }
+        } ?: return "fail"
         val sid = V2Crypto.hex(sliceN(t0, 0, 12))
         val exp = bigEndianBytesToLong(sliceN(t0, 12, 20))
         val ikm = V2Crypto.concatBufs(dhEs, dhEe)

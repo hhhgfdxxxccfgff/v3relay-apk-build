@@ -133,8 +133,8 @@ object V2Crypto {
             outerKey[i] = (c xor 0x5c).toByte()
             i++
         }
-        val inner = blake2s(concat(innerKey, concat(bufs)), ByteArray(0))
-        return blake2s(concat(outerKey, inner), ByteArray(0))
+        val inner = blake2s(concat(arrayOf(innerKey, concat(bufs))), ByteArray(0))
+        return blake2s(concat(arrayOf(outerKey, inner)), ByteArray(0))
     }
 
     fun concatBufs(vararg bs: ByteArray): ByteArray = concat(bs)
@@ -165,7 +165,7 @@ object V2Crypto {
 
     fun v2nonce(base: ByteArray, ctr: Long): ByteArray {
         val n = base.copyOf()
-        val b = ctr and 0xFFFFFFFFFFFFFFFFL
+        val b = ctr
         for (j in 0 until 8) {
             val shift = 56 - 8 * j
             val cntByte = ((b shr shift) and 0xFF).toInt()
@@ -279,7 +279,7 @@ object V2Crypto {
         val ct = if (pt.isEmpty()) ByteArray(0)
         else {
             val ks = chachaKs(key, nonce, 64, pt.size)
-            ByteArray(pt.size) { j -> (pt[j].toInt() xor ks[j]).toByte() }
+            ByteArray(pt.size) { j -> (pt[j].toInt() xor ks[j].toInt()).toByte() }
         }
         val macData = aeadMacData(aad, ct)
         val tag = poly1305(pol, macData)
