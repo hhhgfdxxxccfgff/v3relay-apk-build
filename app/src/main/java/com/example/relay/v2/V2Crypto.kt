@@ -236,7 +236,11 @@ object V2Crypto {
             val blk = data.copyOfRange(i, minOf(i + 16, data.size))
             val padded = ByteArray(17)
             System.arraycopy(blk, 0, padded, 0, blk.size)
-            padded[blk.size] = 1
+            val pad = 16 - blk.size - 1
+            if (pad > 0) {
+                // zeros already zero-initialized in ByteArray
+            }
+            padded[16] = 1  // marker at final byte (LE)
             val num = BigInteger(1, padded)
             acc = acc.add(num).multiply(r).mod(POLY_P)
             i += 16
