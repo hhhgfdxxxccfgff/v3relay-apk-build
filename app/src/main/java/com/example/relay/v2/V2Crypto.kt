@@ -76,8 +76,8 @@ object V2Crypto {
                 ((blk[o + 3].toInt() and 0xFF) shl 24)
         }
         val v = IntArray(16)
-        IV.copyInto(v)
-        h.copyInto(v, 0, 0, 8)
+        IV.copyInto(v, 8)
+        h.copyInto(v, 0)
         v[12] = v[12] xor t.toInt()
         v[13] = v[13] xor ((t shr 32).toInt())
         if (last) v[14] = v[14] xor -1
